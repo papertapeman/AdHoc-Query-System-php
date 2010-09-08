@@ -1,0 +1,343 @@
+/***** GENERAL PAGE & TEXT STYLES *****/
+
+body {
+	font-family: verdana;
+	font-size: 9pt;
+	color: #E89416;
+}
+
+.header22 {
+	font-family: arial, helvetica, sans-serif;
+	font-size: 22pt;
+	font-weight: bold;
+	color: #E89416;
+}
+
+.header18 {
+	font-family: arial, helvetica, sans-serif;
+	font-size: 18pt;
+	font-weight: bold;
+	color: #E89416;
+}
+
+.header14 {
+	font-family: arial, helvetica, sans-serif;
+	font-size: 14pt;
+	font-weight: bold;
+	color: #E89416;
+}
+
+.text14 {
+	font-family: arial, helvetica, sans-serif;
+	font-size: 14pt;
+	color: #E89416;
+}
+
+.normal {
+	font-family: verdana;
+	font-size: 9pt;
+	color: #E89416;
+}
+
+small {
+	font-size: 8pt;
+}
+
+p.date {
+	font-family: sans-serif; 
+	font-size: 8pt; 
+	font-weight: bold; 
+	color: #996704; 
+	text-align: right;
+	background-color: #202020;
+}
+
+p.title {
+	font-family: sans-serif; 
+	font-size: 8pt; 
+	font-weight: bold; 
+	color: #996704; 
+	text-align: left;
+	background-color: #202020;
+}
+
+p.navBar {
+	font-family: sans-serif; 
+	font-size: 8pt; 
+	font-weight: bold; 
+	color: #996704; 
+	text-align: right;
+	background-color: #202020;
+}
+
+/* Link Styles */
+
+a {
+	text-decoration: none;
+	color: #E89416;
+}
+
+a:hover {
+	color: #FFD016;
+}
+
+a.ah {
+	text-decoration: underline;
+/*	color: #E89416; */
+	color: #000000;
+}
+
+a.ah:hover {
+	text-decoration: underline;
+	color: #FFD016;
+}
+
+/* Stock View Text Styles */
+
+.svp2pActive {
+    color: #008800;
+	font-weight: bold;
+}
+
+.svp2pDisabled {
+    color: #AA0000;
+	font-weight: bold;
+}
+
+/* Ad Hoc Text Styles */
+
+.ahTitle {
+    font: arial;
+	font-size: 10pt;
+	font-weight: bold;
+	color: #E89416;
+}
+
+.ahTitleOtherLinks {
+    font: arial;
+	font-size: 10pt;
+	font-weight: bold;
+	color: #C4C4C4;
+	background-color: #404040;
+}
+
+.ahOtherLinks {
+    font: arial;
+	font-size: 10pt;
+	font-weight: bold;
+}
+
+
+/***** TABLE STYLES *****/
+
+td {
+	font-family: verdana;
+	font-size: 9pt;
+	color: #E89416;
+}
+
+/*** Specific Table Cell Styles ***/
+
+/* Dealer Data Admin */
+
+td.searchNotes {
+	font-family: sans-serif; 
+	font-size: 8pt; 
+	color: #FFD816; 
+}
+
+td.dealerSummary {
+	font-family: verdana;
+	font-size: 9pt;
+	color: #E89416;
+	background-color: #202020;
+}
+
+td.ddheader {
+	font-family: verdana;
+	font-weight: bold;
+	font-size: 10pt;
+	color: #FF8016;
+	background-color: #303030;
+}
+
+td.ddtitle {
+	font-family: verdana;
+	font-weight: bold;
+	font-size: 9pt;
+	text-align: right;
+	color: #E89416;
+	background-color: #202020;
+	width: 175px;
+}
+
+td.dddata {
+	font-family: verdana;
+	font-size: 9pt;
+	color: #E89416;
+	background-color: #202020;
+}
+
+td.ddnotes {
+	font-family: sans-serif; 
+	font-size: 8pt; 
+	color: #FFD816; 
+	background-color: #202020;
+}
+
+/* Data Exports */
+
+td.dedata {
+	font-family: arial, helvetica, sans-serif;
+	font-size: 9pt;
+/*	color: #FFD816; */
+	color: #000000;
+/*	background-color: #202020; */
+	background-color: #EEEEEE;
+}
+
+td.detotal {
+	font-family: arial, helvetica, sans-serif;
+	font-size: 9pt;
+/*	color: #FFD816; */
+	color: #000000;
+/*	background-color: #202020; */
+	background-color: #FFC0C0;
+}
+
+td.detitle {
+	font-family: verdana;
+	font-weight: bold;
+	font-size: 9pt;
+	text-align: left;
+	color: #E89416;
+	background-color: #202020;
+}
+
+/* Stock View */
+
+td.svheader {
+	font-family: verdana;
+	font-weight: bold;
+	font-size: 9pt;
+	color: #FF8016;
+	background-color: #303030;
+}
+
+td.svdata {
+	font-family: verdana;
+	font-size: 9pt;
+	color: #000000;
+	background-color: #DDDDDD;
+}
+
+td.svnotes {
+	font-family: verdana;
+	font-size: 9pt;
+	color: #000000;
+	background-color: #EEEEEE;
+}
+
+td.svresults {
+	font-family: verdana;
+	font-size: 8pt;
+	font-weight: bold;
+	color: #707070;
+	background-color: #CCCCCC;
+}
+
+td.sv {
+	font-family: sans-serif;
+	font-size: 9pt;
+	color: #000000;
+	background-color: #DDEEEE;
+}
+
+td.sv2 {
+	font-family: sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	background-color: #DDEEEE;
+}
+
+/* Task Monitor */
+
+td.tmdata {
+	font-family: verdana;
+	font-size: 9pt;
+	color: #E89416;
+	background-color: #303020;
+}
+
+td.tmnotes {
+	font-family: sans-serif; 
+	font-size: 8pt; 
+	color: #FFD816; 
+	background-color: #303020;
+}
+
+/* Ad Hoc */
+
+td.ahMenu1 {
+    font-size: 10pt;
+    background-color: #202020;
+}
+
+td.ahMenu2 {
+    font-weight: bold;
+	color: #FFFFFF;
+/*	color: #FFD816; */
+    background-color: #202020;
+}
+
+td.ahMenu3 {
+	color: black;
+	text-align: center;
+    background-color: #303020;
+}
+
+td.ahParam {
+    font-weight: bold;
+}
+
+td.ahQueryData {
+	font-family: arial, helvetica, sans-serif;
+	font-size: 9pt;
+	color: #FFD816;
+	background-color: #666666;
+}
+
+
+/***** FORM STYLES *****/
+
+/* INPUT Type="text" Elements */
+input.text {
+	width: 200px;
+	height: 20px;
+	border: 0px;
+	color: #FFBB66; 
+	background-color: #303030;
+	font-family: verdana;
+	font-size: 9pt;
+}
+
+/* SELECT Elements */
+select {
+	width: 200px;
+	height: 20px;
+	border: 0px;
+	color: #FFBB66; 
+	background-color: #303030;
+	font-family: verdana;
+	font-size: 9pt;
+}
+
+select.sv {
+	width: 350px;
+	height: 20px;
+	border: 0px;
+	color: #000000; 
+	background-color: #FFFFFF;
+	font-family: verdana;
+	font-size: 9pt;
+}
