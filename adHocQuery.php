@@ -18,10 +18,10 @@ foreach ($_REQUEST as $key => $val)
 $curMenu=$_REQUEST["menunum"];
 $curLine=$_REQUEST["linenum"];
 
-$sql=" SELECT q1.query_num, title, q1.heading_text AS heading, q1.side_labels, q1.total_fields,".
-	"CONCAT(q1.select_fields, ' ', q1.select_from, ' ', q1.select_where, ' ', q1.select_group_by, ' ', q1.select_order_by, ' ', q1.select_footer) AS detail_select,".
+$sql=" SELECT q1.query_num, title, q1.heading_text AS heading, q1.total_fields,".
+	"q1.link_field, q1.select_stmt AS detail_select,".
         "q1.pre_select,".
-	"CONCAT(q2.select_fields, ' ', q2.select_from, ' ', q2.select_where, ' ',q2.select_group_by, ' ', q2.select_order_by, ' ', q2.select_footer) AS title_select,".
+	"q2.select_stmt AS title_select,".
     " udb_name, udb_server, udb_username, udb_password".
     " FROM menus m".
     " JOIN queries q1 ON m.main_query_num = q1.query_num".
@@ -38,7 +38,6 @@ $row = pdoFirstRow($adhocStmt);
 
 $title=pdoData($row,"title");
 $heading=pdoData($row,"heading");
-$sideLabels=pdoData($row,"side_labels");
 
 //Analyse totalling required
 $totalFieldList=pdoData($row,"total_fields");
@@ -54,6 +53,8 @@ if ($hasTotalFields)
     $totalFieldOffset[$i]=-1.0;
     $totalFieldValue[$i]=0.0;
   }
+
+$sideLabels=(strlen(pdoData($row,"link_field"))>0);
 
 $preSelect=pdoData($row,"pre_select");
 TraceHide("pre_select query=".$preSelect);
@@ -109,25 +110,6 @@ if ((strpos($detailSelect,"sp_") ? strpos($detailSelect,"sp_")+1 : 0)>0
    $isStoredProcedure=true;
 else
    $isStoredProcedure=false;
-
-//===================================================================================
-//Look for a link field (that is, a SELECTed field used as a link to another query)
-$linkField=queryLinkField($detailSelect);
-traceHide("linkField=".$linkField);
-if(strlen($linkField))
-{
-  $detailSelect=str_replace(cLinkDelimiter,"",$detailSelect);
-  traceHide("Linked detailSelect=".$detailSelect);
-  $isLink=true;
-  //If it's a stored procedure, the field reference must also be removed
-  if ($isStoredProcedure)
-    $detailSelect=str_replace($linkField,"",$detailSelect);
-}
-else
-{
-  $isLink=false;
-  $linkField="";
-}
 
 //Connect to the the user database
 $conn_udb=pdoConnect($udb_server, $udb_name, $udb_username, $udb_password);
@@ -269,7 +251,6 @@ if (strlen($heading)>0)
 
 //===================================================================================
 // Decide whether to display with side-labels
-$fOtherLink=false;
 if ($numRecords<=1 && $sideLabels)
 {
 //-------------------------------------------------------------------------------------
@@ -339,7 +320,7 @@ foreach($udbRows as $udbRow)
 } 
 
 //Display Totals
-if ($hasTotalFields)
+if (($hasTotalFields)&&($numRecords>0))
 {
 ?>
   <TR>
@@ -373,8 +354,9 @@ if (cShowRelatedQueries)
 //Look for related enquiries, that is, where this user's query string variables
 // can be used in other adHocQuery records
 
-      $relatedSelect="SELECT m.menu_num, m.line_num, m.title FROM queries q JOIN menus m ON m.main_query_num = q.query_num"
-          ." WHERE m.menu_num <> 999 AND select_where LIKE '%".cParamDelimiter.$relatedItem.cParamDelimiter."%'"
+      $relatedSelect="SELECT m.menu_num, m.line_num, m.title, q.select_stmt"
+          ." FROM queries q JOIN menus m ON m.main_query_num = q.query_num"
+          ." WHERE q.select_stmt LIKE '%".cParamDelimiter.$relatedItem.cParamDelimiter."%'"
           ." AND m.hidden = 0"
           ." AND q.query_num <> ".$thisQuery." AND (q.pre_select IS NULL OR q.pre_select = '')"
           ." AND EXISTS( SELECT * FROM menus mm WHERE mm.main_query_num = q.query_num GROUP BY mm.main_query_num"
@@ -384,22 +366,25 @@ if (cShowRelatedQueries)
       traceHide("relatedSelect=".$relatedSelect);
       $adhocStmt = pdoQuery($relatedSelect,$connAdHoc);
 
+      $numRecords=pdoRowCount($adhocStmt);
       traceHide($relatedSelect);
-      traceHide($adhocStmt->rowCount()." records");
+      traceHide($numRecords." records");
 
-      if ($adhocStmt->rowCount()>0)
+      if ($numRecords>0)
       {
 ?>
         <br/>
-        <p class="ahTitleOtherLinks"><?echo $relatedTitle;?> (<?echo $adhocStmt->rowCount();?> items)</p>
+        <p class="ahTitleOtherLinks"><?echo $relatedTitle;?> (<?echo $numRecords;?> items)</p>
         <UL>
 <? 
       } 
       foreach($adhocStmt as $row)
       {
+        $nextScript=(hasAllParams(pdoData($row,"select_stmt"))? "adHocQuery.php":"adHocParam.php");
         TraceHide(pdoData($row,"menu_num")."/".pdoData($row,"line_num").", ".pdoData($row,"title"));
-        $linkHTML="<A HREF=\"adHocQuery.php?menunum=".pdoData($row,"menu_num")."&linenum="
-                  .pdoData($row,"line_num").$passThruData."\">".pdoData($row,"title")."</A>";
+        $linkHTML="<A HREF=\"".$nextScript."?menunum=".pdoData($row,"menu_num")
+                  ."&linenum=".pdoData($row,"line_num")
+                  .$passThruData."\">".pdoData($row,"title")."</A>";
 ?>
         <LI class="ahOtherLinks"><? echo $linkHTML;?></LI><br />
 <? 

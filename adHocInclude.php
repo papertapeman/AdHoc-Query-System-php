@@ -228,24 +228,58 @@ function getName($n)
 } 
 
 //===================================================================================
+// Return the value of a request name, or "" if not found
+//===================================================================================
+function requestValue($requestName)
+{
+  $s=str_replace(" ","_",$requestName);
+  foreach($_REQUEST as $key => $val)
+    if ($key==$s)
+      return $val;
+
+  return "";
+}
+
+//===================================================================================
+// Return true if request name found
+//===================================================================================
+function requestPresent($requestName)
+{
+  $s=str_replace(" ","_",$requestName);
+  foreach($_REQUEST as $key => $val)
+    if ($key==$s)
+      return true;
+
+  return false;
+}
+
+//===================================================================================
+// Returns true if request object has all required values to satisfy $where params
+//===================================================================================
+function hasAllParams($where)
+{
+  // elements 1, 3, 5 etc will hold the request names
+  $split=explode(cParamDelimiter,$where);
+  for($i=1;$i<count($split);$i+=2)
+  {
+    traceHide("check for requestName=".$split[$i]);
+    if (!requestPresent($split[$i]))
+    {
+      traceHide("can't find requestName=".$split[$i]);
+      return false;
+    }
+  }
+  traceHide("has all params");
+  return true;
+}
+
+//===================================================================================
 // Merge subquery into master query
 //===================================================================================
 function mergeSQLQuery($masterQuery,$subQuery)
 {
   return str_replace("subQuery",$subQuery,$masterQuery);
 } 
-
-//===================================================================================
-// Looks for a link field with a query. Returns the link if found, or empty string
-//===================================================================================
-function queryLinkField($query)
-{
-  $linkField=explode(cLinkDelimiter,$query);
-  if(count($linkField)>1)
-    return $linkField[1];
-  else
-    return "";
-}
 
 //===================================================================================
 // Load storage array with list of total fields required
@@ -297,6 +331,9 @@ function incrementTotalField($valueArray,$offsetArray,$iColumnOffset,$dataItem)
   return $valueArray;
 } 
 
+//===================================================================================
+// Return to accumulated value for the column (a non-total column gets "-----")
+//===================================================================================
 function totalForColumn($valueArray,$offsetArray,$iColumnOffset)
 {
   $dataItem="-----";
@@ -311,6 +348,9 @@ function totalForColumn($valueArray,$offsetArray,$iColumnOffset)
   return $dataItem;
 } 
 
+//===================================================================================
+// Load the link field info for use in creating links to related queries
+//===================================================================================
 function loadLinks($dbAdHoc)
 {
   $sql = "SELECT q.link_field, m.menu_num, m.line_num FROM queries q".
@@ -348,6 +388,34 @@ function getLinkData($gblRows, $passThruData, $field, $data)
   }
 
   return $data;
+}
+
+//===================================================================================
+// Convert a date from a request parameter form (yyyymmdd) to "dd/mm/yyyy"
+//===================================================================================
+function formatDate($yyyymmdd)
+{
+  return substr($yyyymmdd,6,2).cDateSeparator
+        .substr($yyyymmdd,4,2).cDateSeparator
+        .substr($yyyymmdd,0,4);
+}
+
+//===================================================================================
+// Convert an entered date in the form dd/mm/yy or dd/mm/yyyy to a request
+// parameter form (yyyymmdd). yy > 50 = 19nn, yy <= 50 = 20nn
+//===================================================================================
+function unformatDate($dd_mm_yyyy)
+{
+  $invalidDate="19000101";
+  $dateParts=explode(cDateSeparator,$dd_mm_yyyy);
+  if (count($dateParts) < 3)
+    return $invalidDate;
+  if (strlen($datePart[2])==2)
+    if ($datePart[2]<=50)
+      $datePart[2]+=2000;
+    else
+      $datePart[2]+=1900;
+  return $datePart[2].$datePart[1].$datePart[0];
 }
 ?>
 

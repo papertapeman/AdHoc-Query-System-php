@@ -15,6 +15,7 @@ define("cMenuFormatGet", true);
 define("cHeaderComment", "<!-- adHoc Query System -->");
 define("cParamDelimiter", "++");
 define("cLinkDelimiter", "~");
+define("cDateSeparator", "/");
 
 define("cAdHocServer","localhost");
 define("cAdHocDatabase","adhoc");
