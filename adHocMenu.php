@@ -13,7 +13,7 @@ else
   $nextMenu="1";
 traceHide("nextmenu=".$nextMenu);
 
-$sql=" SELECT menu_num, line_num, title, sub_menu_num, select_where".
+$sql=" SELECT menu_num, line_num, title, sub_menu_num, select_stmt".
     " FROM menus".
     " LEFT JOIN queries ON main_query_num = query_num".
     " WHERE menu_num = ".$nextMenu.
@@ -71,7 +71,7 @@ foreach($adHocRows as $row)
   {
     //This is a query request
     //Check to see if adHocParam page required
-    if (queryHasParams(pdoData($row,"select_where")))
+    if (queryHasParams(pdoData($row,"select_stmt")))
     {
       //Query with arguments
       if (cMenuFormatGet)
