@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 require_once("adHocConst.php");
 require_once("adHocInclude.php");
 
@@ -10,6 +10,13 @@ $connAdHoc=pdoConnect(cAdHocServer, cAdHocDatabase, cAdHocUsername, cAdHocPasswo
 
 // load a recordset for links to create in the following query results
 $gblRows=loadLinks($connAdHoc);
+
+$siteNum=$_SESSION["sitenum"];
+$sqlSite="SELECT site_name FROM sites WHERE site_num = ".$siteNum;
+$siteStmt = pdoQuery($sqlSite,$connAdHoc);
+$siteRow = pdoFirstRow($siteStmt);
+$siteName=pdoData($siteRow,"site_name");
+
 
 traceHide("Passed keys / value");
 foreach ($_REQUEST as $key => $val)
@@ -24,9 +31,10 @@ $sql=" SELECT q1.query_num, title, q1.heading_text AS heading, q1.total_fields,"
 	"q2.select_stmt AS title_select,".
     " udb_name, udb_server, udb_username, udb_password".
     " FROM menus m".
-    " JOIN queries q1 ON m.main_query_num = q1.query_num".
-    " LEFT JOIN queries q2 ON m.title_query_num = q2.query_num".
-    " LEFT JOIN userdbs AS d1 ON d1.udb_num = q1.udb_num".
+    " LEFT JOIN queries AS q1 ON m.main_query_num = q1.query_num".
+    " LEFT JOIN queries AS q2 ON m.title_query_num = q2.query_num".
+    " LEFT JOIN sitedbs AS s ON s.udb_num = q1.udb_num"." AND s.site_num = ".$siteNum.
+    " LEFT JOIN dbs AS d ON d.udb_num = s.udb_num".
     " WHERE m.menu_num = ".$curMenu." AND m.line_num = ".$curLine;
 
 traceHide("main query=".$sql);
@@ -93,6 +101,7 @@ $pageDate=dateNow();
 <TR><TD WIDTH="3">&nbsp;</TD><TD>
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%"><TR>
   <TD><P CLASS="title">Ad Hoc Query <? echo $curMenu;?> / <? echo $curLine;?> / <? echo $thisQuery;?></P></TD>
+  <TD><P CLASS="title"><?echo $siteName;?></TD>
   <TD><P CLASS="date"><? echo $pageDate;?></P></TD>
 </TR></TABLE>
 <CENTER>
@@ -192,12 +201,6 @@ else
 $numRecords=pdoRowCount($udbStmt);
 
 //===================================================================================
-//This section gets the original query string to pass through when linking to
-//another query
-$passThruData=queryStringData("");
-traceHide("passThruData=".$passThruData);
-
-//===================================================================================
 // Home and Back buttons
 ?>
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%"><TR><TD ALIGN="right">
@@ -267,7 +270,7 @@ if ($numRecords<=1 && $sideLabels)
 ?>
       <TR>
       <TD class="ddheader"><?echo $fieldName;?></TD>
-      <TD class="dedata"><?echo getLinkData($gblRows, $passThruData, $fieldName, $dataItem);?></TD>
+      <TD class="dedata"><?echo getLinkData($gblRows, $fieldName, $dataItem);?></TD>
       </TR>
 <? 
     }
@@ -308,7 +311,7 @@ foreach($udbRows as $udbRow)
     if ($hasTotalFields)
       $totalFieldValue=incrementTotalField($totalFieldValue,$totalFieldOffset,$colCnt,$dataItem);
 
-    $linkHTML=getLinkData($gblRows, $passThruData, $fieldName, $dataItem);
+    $linkHTML=getLinkData($gblRows, $fieldName, $dataItem);
     $colCnt++;
 ?>
     <TD class="dedata"><? echo $linkHTML;?></TD>
@@ -384,7 +387,7 @@ if (cShowRelatedQueries)
         TraceHide(pdoData($row,"menu_num")."/".pdoData($row,"line_num").", ".pdoData($row,"title"));
         $linkHTML="<A HREF=\"".$nextScript."?menunum=".pdoData($row,"menu_num")
                   ."&linenum=".pdoData($row,"line_num")
-                  .$passThruData."\">".pdoData($row,"title")."</A>";
+                  .queryStringData("")."\">".pdoData($row,"title")."</A>";
 ?>
         <LI class="ahOtherLinks"><? echo $linkHTML;?></LI><br />
 <? 

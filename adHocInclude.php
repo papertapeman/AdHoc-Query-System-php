@@ -59,7 +59,9 @@ function pdoQuery($sql, $dbh)
 {
   try
   {
-    $stmt = $dbh->query($sql);
+    //$stmt = $dbh->query($sql);
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
   }
   catch(PDOException $e)
   {
@@ -84,6 +86,21 @@ function pdoFetch($stmt)
    return $rows;
 }
 
+//===================================================================================
+// Close recordset
+//===================================================================================
+function pdoClose($stmt)
+{
+   try
+   {
+     $stmt->closeCursor();
+   }
+   catch(PDOException $e)
+   {
+     die($e->getMessage());
+   }   
+   return;
+}
 //===================================================================================
 // Return first row from a recordset
 //===================================================================================
@@ -359,14 +376,17 @@ function loadLinks($dbAdHoc)
   return pdoFetch($stmt);
 }
 
-function getLinkData($gblRows, $passThruData, $field, $data)
+//===================================================================================
+// Construct hyperlink for query result data item
+//===================================================================================
+function getLinkData($gblRows, $field, $data)
 {
   foreach($gblRows as $row)
   {
     if(strtolower($row["link_field"])==strtolower($field))
     {
-     $linkHTML="<A class=\"ah\" HREF=\"adHocQuery.php?menunum=".$row["menu_num"]."&linenum=".$row["line_num"]."&".
-				$field."=".$data.$passThruData."\">".$data."</A>";
+     $linkHTML="<A class=\"ah\" HREF=\"adHocQuery.php?menunum=".$row["menu_num"]."&linenum=".$row["line_num"].
+				queryStringData($field)."&".$field."=".$data."\">".$data."</A>";
       return $linkHTML;
     }
   }
@@ -416,6 +436,32 @@ function unformatDate($dd_mm_yyyy)
     else
       $datePart[2]+=1900;
   return $datePart[2].$datePart[1].$datePart[0];
+}
+
+//===================================================================================
+// Add new line characters to make editing a query easier
+//===================================================================================
+function formatSql($sql)
+{
+  $keyword1 = array(" from"," left join"," inner join"," join"," where"," order");
+  $keyword2 = array("\nfrom","\nleft join","\ninner join","\njoin","\nwhere","\norder");
+  return str_replace($keyword1, $keyword2, $sql);
+}
+
+//===================================================================================
+// Remove new line characters (replacing with a space) from the edited query
+//===================================================================================
+function unformatSql($sql)
+{
+  return str_replace("\n", " ", $sql);
+}
+
+//===================================================================================
+// Allow for single quotes in SQL literal
+//===================================================================================
+function sqlLiteral($lit)
+{
+  return "'".str_replace("'", "\'", $lit)."'";
 }
 ?>
 

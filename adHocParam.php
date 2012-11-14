@@ -1,5 +1,7 @@
 <?php
 //adHocParam.php
+
+session_start();
 require("adHocConst.php");
 require("adHocInclude.php");
 
@@ -8,8 +10,8 @@ foreach ($_REQUEST as $key => $val)
   traceHide("key:".$key." / val:".$val);
 
 $connAdHoc=pdoConnect(cAdHocServer, cAdHocDatabase, cAdHocUsername, cAdHocPassword);
-$thisMenu=$_GET{"menunum"};
-$thisLine=$_GET{"linenum"};
+$thisMenu=$_REQUEST["menunum"];
+$thisLine=$_REQUEST["linenum"];
 
 $sql=" SELECT title, select_stmt".
     " FROM menus".
@@ -17,6 +19,12 @@ $sql=" SELECT title, select_stmt".
     " WHERE menu_num = ".$thisMenu." AND line_num = ".$thisLine;
 
 $stmt = pdoQuery($sql,$connAdHoc);
+
+$siteNum=$_SESSION["sitenum"];
+$sqlSite="SELECT site_name FROM sites WHERE site_num = ".$siteNum;
+$siteStmt = pdoQuery($sqlSite,$connAdHoc);
+$siteRow = pdoFirstRow($siteStmt);
+$siteName=pdoData($siteRow,"site_name");
 
 //get today's date
 $pageDate=dateNow();
@@ -42,6 +50,7 @@ function doInputForm() {
 <TR><TD WIDTH="3">&nbsp;</TD><TD WIDTH="597">
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%"><TR>
   <TD><P CLASS="title">Ad Hoc Parameter <? echo $thisMenu;?> / <? echo $thisLine;?></P></TD>
+  <TD><P CLASS="title"><?echo $siteName;?></TD>
   <TD><P CLASS="date"><? echo $pageDate;?></P></TD>
 </TR></TABLE>
 <CENTER>
@@ -85,6 +94,7 @@ pdoDisconnect($connAdHoc);
 </TR>
 </TABLE>
 </CENTER>
+  <INPUT TYPE="hidden" NAME="sitenum" VALUE="<? echo $thisSite;?>">
   <INPUT TYPE="hidden" NAME="menunum" VALUE="<? echo $thisMenu;?>">
   <INPUT TYPE="hidden" NAME="linenum" VALUE="<? echo $thisLine;?>">
 </FORM>

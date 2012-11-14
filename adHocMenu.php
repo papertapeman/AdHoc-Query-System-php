@@ -1,5 +1,6 @@
 <?php
 // adHocMenu.php
+session_start();
 require_once("adHocConst.php");
 require_once("adHocInclude.php");
 $connAdHoc=pdoConnect(cAdHocServer, cAdHocDatabase, cAdHocUsername, cAdHocPassword);
@@ -7,7 +8,21 @@ $connAdHoc=pdoConnect(cAdHocServer, cAdHocDatabase, cAdHocUsername, cAdHocPasswo
 //get today's date
 $pageDate=dateNow();
 
-if(count($_REQUEST)>0)
+//request sitenum takes precedent over session sitenum
+if(isset($_REQUEST["sitenum"]))
+  $siteNum=$_REQUEST["sitenum"];
+else
+{
+  if(isset($_SESSION["sitenum"]))
+    $siteNum=$_SESSION["sitenum"];
+  else
+    $siteNum="1";
+}
+
+$_SESSION["sitenum"]=$siteNum;
+traceHide("sitenum=".$siteNum);
+
+if(isset($_REQUEST["nextmenu"]))
   $nextMenu=$_REQUEST["nextmenu"];
 else
   $nextMenu="1";
@@ -31,10 +46,38 @@ $adHocRows = pdoFetch($adHocStmt);
 </HEAD>
 <BODY BGCOLOR="#000000">
 <!-- Header table -->
-<TABLE BORDER="0" WIDTH="600" CELLPADDING="0" CELLSPACING="0">
+<TABLE BORDER="0" WIDTH="800" CELLPADDING="0" CELLSPACING="0">
 <TR><TD WIDTH="3">&nbsp;</TD><TD WIDTH="597">
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%"><TR>
   <TD><P CLASS="title">Ad Hoc Menu (<? echo $nextMenu;?> / <? echo pdoRowCount($adHocStmt);?>)</P></TD>
+<?
+if (cMultipleSites)
+{
+  $sqlSites="SELECT site_num, site_name FROM sites";
+  $adHocSitesStmt = pdoQuery($sqlSites,$connAdHoc);
+  $adHocSitesRows = pdoFetch($adHocSitesStmt);
+?>
+<TD>
+<FORM ACTION="adHocMenu.php" METHOD="post">
+<SELECT NAME="sitenum" SIZE="1" ONCHANGE="this.form.submit();">
+<?
+  foreach($adHocSitesRows as $row)
+  {
+   if ($siteNum==pdoData($row,"site_num"))
+     $sel="SELECTED";
+   else
+     $sel="";
+?>
+<OPTION <?echo $sel?> VALUE="<?echo pdoData($row,"site_num");?>"><?echo pdoData($row,"site_name");?></OPTION>
+<?
+  }
+?>
+</SELECT>
+</FORM>
+</TD>
+<?
+}
+?>
   <TD><P CLASS="date"><? echo "&nbsp;&nbsp;".$pageDate;?></P></TD>
 </TR></TABLE>
 <CENTER>
@@ -139,7 +182,7 @@ foreach($adHocRows as $row)
 	<TD class="ahMenu2">&nbsp;&nbsp;<?       echo pdoData($row,"title");?>&nbsp;&nbsp;</TD>
 	<TD class="ahMenu3">
 	<FORM ACTION="adhocMenu.php" METHOD="POST">
-	 <INPUT TYPE="hidden" NAME="nextmenu" VALUE="<?       echo pdoData($row,"sub_menu_num");?>">
+	 <INPUT TYPE="hidden" NAME="nextmenu" VALUE="<?echo pdoData($row,"sub_menu_num");?>">
 	 <INPUT TYPE="submit" VALUE="Next">
 	</FORM>
 	</TD>
